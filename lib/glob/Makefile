@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -53,7 +53,7 @@ BASHINCDIR = ${topdir}/include
 INCLUDES = -I. -I../.. -I$(topdir) -I$(BASHINCDIR) -I$(topdir)/lib
 
 CCFLAGS = $(PROFILE_FLAGS) $(DEFS) $(LOCAL_DEFS) ${INCLUDES} $(CPPFLAGS) \
-	  $(LOCAL_CFLAGS) $(CFLAGS)
+	  $(LOCAL_CFLAGS) $(CFLAGS) ${ADDON_CFLAGS}
 
 # Here is a rule for making .o files from .c files that doesn't force
 # the type of the machine (like -sun3) into the flags.
@@ -164,4 +164,5 @@ xmbsrtowcs.o: xmbsrtowcs.c
 
 # dependencies for C files that include other C files
 glob.o: glob_loop.c
+gmisc.o: gm_loop.c
 smatch.o: sm_loop.c

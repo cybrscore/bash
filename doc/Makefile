@@ -16,12 +16,12 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE = bash
-VERSION = 4.4-release
+VERSION = 5.0-release
 
 PACKAGE_BUGREPORT = bug-bash@gnu.org
 PACKAGE_NAME = bash
-PACKAGE_STRING = bash 4.4-release
-PACKAGE_VERSION = 4.4-release
+PACKAGE_STRING = bash 5.0-release
+PACKAGE_VERSION = 5.0-release
 
 PACKAGE_TARNAME = bash
 
@@ -58,7 +58,7 @@ man3dir = $(mandir)/$(manpfx)3
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 SUPPORT_SRCDIR = $(topdir)/support
 

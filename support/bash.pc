@@ -22,7 +22,7 @@ SHOBJ_LIBS =
 
 Name: bash
 Description: Bash headers for bash loadable builtins
-Version: 4.4-release
+Version: 5.0-release
 Url: 
 Libs: ${SHOBJ_LIBS}
 Cflags: ${SHOBJ_CFLAGS} ${CCFLAGS} -I${headersdir} -I${headersdir}/builtins -I${headersdir}/include

@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -52,7 +52,7 @@ BASHINCDIR = ${topdir}/include
 
 INCLUDES = -I. -I../.. -I$(topdir) -I${BASHINCDIR} -I$(topdir)/lib
 
-CCFLAGS = $(PROFILE_FLAGS) $(DEFS) $(LOCAL_DEFS) $(CPPFLAGS) \
+CCFLAGS = ${ASAN_CFLAGS} $(PROFILE_FLAGS) $(DEFS) $(LOCAL_DEFS) $(CPPFLAGS) \
 	  ${INCLUDES} $(LOCAL_CFLAGS) $(CFLAGS)
 
 .c.o:

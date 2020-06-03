@@ -18,7 +18,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}

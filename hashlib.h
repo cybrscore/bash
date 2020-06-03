@@ -21,9 +21,9 @@
 #if !defined(_HASHLIB_H_)
 #define _HASHLIB_H_
 
-#include "stdc.h"
-
 #include "../general.h"
+
+#include "stdc.h"
 
 #ifndef PTR_T
 #ifdef __STDC__

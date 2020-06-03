@@ -16,13 +16,13 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE = bash
-VERSION = 4.4-release
+VERSION = 5.0-release
 
 SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-top_builddir = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+top_builddir = /home/jvanriper/jvanriper/bash/bash-5.0
 
 
 prefix = /usr/local
@@ -239,7 +239,7 @@ libintl.h: libgnuintl.h
 	cmp libgnuintl.h libintl.h || cp libgnuintl.h libintl.h
 
 charset.alias: $(srcdir)/config.charset
-	$(SHELL) $(srcdir)/config.charset 'x86_64-unknown-linux-gnu' > t-$@
+	$(SHELL) $(srcdir)/config.charset 'x86_64-pc-linux-gnu' > t-$@
 	mv t-$@ $@
 
 check: all
