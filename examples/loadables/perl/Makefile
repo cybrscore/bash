@@ -30,7 +30,7 @@ includedir = ${prefix}/include
 datarootdir = ${prefix}/share
 
 topdir = ../../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 srcdir = .
 
 

@@ -22,9 +22,9 @@
 #ifndef _ARRAY_H_
 #define _ARRAY_H_
 
-#include "stdc.h"
-
 #include "../command.h"
+
+#include "stdc.h"
 
 typedef intmax_t arrayind_t;
 
@@ -35,6 +35,7 @@ typedef struct array {
   enum atype type;
   arrayind_t max_index;
   int num_elements;
+  struct array_element* lastref;
   struct array_element* head;
 } ARRAY;
 
@@ -96,6 +97,7 @@ extern ARRAY* array_from_string __P((char*, char*));
 
 #define array_num_elements(a) ((a)->num_elements)
 #define array_max_index(a) ((a)->max_index)
+#define array_first_index(a) ((a)->head->next->ind)
 #define array_head(a) ((a)->head)
 #define array_empty(a) ((a)->num_elements == 0)
 
@@ -103,6 +105,8 @@ extern ARRAY* array_from_string __P((char*, char*));
 #define element_index(ae) ((ae)->ind)
 #define element_forw(ae) ((ae)->next)
 #define element_back(ae) ((ae)->prev)
+
+#define set_element_value(ae, val) ((ae)->value = (val))
 
 /* Convenience */
 #define array_push(a, v)       \

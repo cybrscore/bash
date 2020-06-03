@@ -18,10 +18,10 @@
 #
 
 PACKAGE = bash
-VERSION = 4.4-release
+VERSION = 5.0-release
 
 PACKAGE_NAME = bash
-PACKAGE_VERSION = 4.4-release
+PACKAGE_VERSION = 5.0-release
 
 # Include some boilerplate Gnu makefile definitions.
 prefix = /usr/local
@@ -38,7 +38,7 @@ loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 srcdir = .
 
 
@@ -59,7 +59,7 @@ SHELL = /bin/sh
 
 host_os = linux-gnu
 host_cpu = x86_64
-host_vendor = unknown
+host_vendor = pc
 
 CFLAGS = -g -O2 -Wno-parentheses -Wno-format-security
 LOCAL_CFLAGS = 

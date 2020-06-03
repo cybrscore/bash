@@ -1,6 +1,6 @@
 /* shell.c -- GNU's idea of the POSIX shell specification. */
 
-/* Copyright (C) 1987-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2017 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -54,12 +54,14 @@
 #include "builtins/common.h"
 #include "flags.h"
 #include "mailcheck.h"
+#include "parser.h"
 #include "shell.h"
 #include "trap.h"
 
 #if defined(JOB_CONTROL)
 #include "jobs.h"
 #else
+extern int running_in_background;
 extern int initialize_job_control __P((int));
 extern int get_tty_state __P((void));
 #endif /* JOB_CONTROL */
@@ -91,7 +93,7 @@ extern int get_tty_state __P((void));
 
 #if defined(AUDIT_BASH)
 #include "audit_cmd.h"
-#endif // AUDIT_BASH
+#endif
 
 #if !defined(HAVE_GETPW_DECLS)
 extern struct passwd* getpwuid();
@@ -105,22 +107,12 @@ extern int errno;
 extern char** environ; /* used if no third argument to main() */
 #endif
 
-extern char *dist_version, *release_status;
-extern int patch_level, build_version;
-extern int shell_level;
-extern int subshell_environment;
-extern int running_in_background;
-extern int last_command_exit_value;
-extern int line_number;
-extern int expand_aliases;
-extern int array_needs_making;
 extern int gnu_error_format;
-extern char *primary_prompt, *secondary_prompt;
-extern char* this_command_name;
 
 /* Non-zero means that this shell has already been run; i.e. you should
    call shell_reinitialize () if you need to start afresh. */
 int shell_initialized = 0;
+int bash_argv_initialized = 0;
 
 COMMAND* global_command = (COMMAND*)NULL;
 
@@ -235,6 +227,8 @@ int dump_po_strings; /* Dump strings in $"..." in po format */
 int wordexp_only = 0; /* Do word expansion only */
 int protected_mode = 0; /* No command substitution with --wordexp */
 
+int pretty_print_mode = 0; /* pretty-print a shell script */
+
 #if defined(STRICT_POSIX)
 int posixly_correct = 1; /* Non-zero means posix.2 superset. */
 #else
@@ -263,6 +257,7 @@ static const struct {
   { "noprofile", Int, &no_profile, (char**)0x0 },
   { "norc", Int, &no_rc, (char**)0x0 },
   { "posix", Int, &posixly_correct, (char**)0x0 },
+  { "pretty-print", Int, &pretty_print_mode, (char**)0x0 },
 #if defined(WORDEXP_OPTION)
   { "protected", Int, &protected_mode, (char**)0x0 },
 #endif
@@ -300,6 +295,7 @@ int want_pending_command; /* -c flag supplied */
 
 /* This variable is not static so it can be bound to $BASH_EXECUTION_STRING */
 char* command_execution_string; /* argument to -c option */
+char* shell_script_filename; /* shell script */
 
 int malloc_trace_at_exit = 0;
 
@@ -433,7 +429,7 @@ char **argv, **env;
   arg_index = 1;
   if (arg_index > argc)
     arg_index = argc;
-  command_execution_string = (char*)NULL;
+  command_execution_string = shell_script_filename = (char*)NULL;
   want_pending_command = locally_skip_execution = read_from_stdin = 0;
   default_input = stdin;
 #if defined(BUFFERED_INPUT)
@@ -577,7 +573,6 @@ char **argv, **env;
    */
   if (interactive_shell) {
     char *term, *emacs, *inside_emacs;
-    ;
     int emacs_term, in_emacs;
 
     term = get_string_value("TERM");
@@ -657,6 +652,20 @@ char **argv, **env;
   restricted = 0;
 #endif
 
+  /* Set positional parameters before running startup files. top_level_arg_index
+     holds the index of the current argument before setting the positional
+     parameters, so any changes performed in the startup files won't affect
+     later option processing. */
+  if (wordexp_only)
+    ; /* nothing yet */
+  else if (command_execution_string)
+    arg_index = bind_args(argv, arg_index, argc, 0); /* $0 ... $n */
+  else if (arg_index != argc && read_from_stdin == 0) {
+    shell_script_filename = argv[arg_index++];
+    arg_index = bind_args(argv, arg_index, argc, 1); /* $1 ... $n */
+  } else
+    arg_index = bind_args(argv, arg_index, argc, 1); /* $1 ... $n */
+
   /* The startup files are run with `set -e' temporarily disabled. */
   if (locally_skip_execution == 0 && running_setuid == 0) {
     old_errexit_flag = exit_immediately_on_error;
@@ -684,7 +693,7 @@ char **argv, **env;
 #if defined(WORDEXP_OPTION)
   if (wordexp_only) {
     startup_state = 3;
-    last_command_exit_value = run_wordexp(argv[arg_index]);
+    last_command_exit_value = run_wordexp(argv[top_level_arg_index]);
     exit_shell(last_command_exit_value);
   }
 #endif
@@ -693,7 +702,6 @@ char **argv, **env;
   uwp_init();
 
   if (command_execution_string) {
-    arg_index = bind_args(argv, arg_index, argc, 0);
     startup_state = 2;
 
     if (debugging_mode)
@@ -711,10 +719,9 @@ char **argv, **env;
 
   /* Get possible input filename and set up default_buffered_input or
      default_input as appropriate. */
-  if (arg_index != argc && read_from_stdin == 0) {
-    open_shell_script(argv[arg_index]);
-    arg_index++;
-  } else if (interactive == 0) {
+  if (shell_script_filename)
+    open_shell_script(shell_script_filename);
+  else if (interactive == 0) {
 /* In this mode, bash is reading a script from stdin, which is a
 	 pipe or redirected file. */
 #if defined(BUFFERED_INPUT)
@@ -723,15 +730,12 @@ char **argv, **env;
     setbuf(default_input, (char*)NULL);
 #endif /* !BUFFERED_INPUT */
     read_from_stdin = 1;
-  } else if (arg_index == argc)
+  } else if (top_level_arg_index == argc) /* arg index before startup files */
     /* "If there are no operands and the -c option is not specified, the -s
        option shall be assumed." */
     read_from_stdin = 1;
 
   set_bash_input();
-
-  /* Bind remaining args to $1 ... $n */
-  arg_index = bind_args(argv, arg_index, argc, 1);
 
   if (debugging_mode && locally_skip_execution == 0 && running_setuid == 0 && (reading_shell_script || interactive_shell == 0))
     start_debugger();
@@ -757,7 +761,7 @@ char **argv, **env;
     get_tty_state();
 #if defined(AUDIT_BASH)
     audit_start();
-#endif // AUDIT_BASH
+#endif
   }
 
 #if !defined(ONESHOT)
@@ -766,11 +770,18 @@ read_and_execute:
 
   shell_initialized = 1;
 
+  if (pretty_print_mode && interactive_shell) {
+    internal_warning(_("pretty-printing mode ignored in interactive shells"));
+    pretty_print_mode = 0;
+  }
+  if (pretty_print_mode)
+    exit_shell(pretty_print_loop());
+
   /* Read commands until exit condition. */
   reader_loop();
 #if defined(AUDIT_BASH)
   audit_stop();
-#endif // AUDIT_BASH
+#endif
   exit_shell(last_command_exit_value);
 }
 
@@ -958,7 +969,7 @@ void
     sh_exit(s) int s;
 {
 #if defined(MALLOC_DEBUG) && defined(USING_BASH_MALLOC)
-  if (malloc_trace_at_exit)
+  if (malloc_trace_at_exit && (subshell_environment & (SUBSHELL_COMSUB | SUBSHELL_PROCSUB)) == 0)
     trace_malloc_stats(get_name_for_error(), (char*)NULL);
 /* mlocation_write_table (); */
 #endif
@@ -1176,6 +1187,10 @@ int
   if (*temp == '-')
     temp++;
   if (restricted || (STREQ(temp, RESTRICTED_SHELL_NAME))) {
+#if defined(RBASH_STATIC_PATH_VALUE)
+    bind_variable("PATH", RBASH_STATIC_PATH_VALUE, 0);
+    stupidly_hack_special_variables("PATH"); /* clear hash table */
+#endif
     set_var_read_only("PATH");
     set_var_read_only("SHELL");
     set_var_read_only("ENV");
@@ -1330,12 +1345,18 @@ static int
 int arg_start, arg_end, start_index;
 {
   register int i;
-  WORD_LIST* args;
+  WORD_LIST *args, *tl;
 
-  for (i = arg_start, args = (WORD_LIST*)NULL; i < arg_end; i++)
-    args = make_word_list(make_word(argv[i]), args);
+  for (i = arg_start, args = tl = (WORD_LIST*)NULL; i < arg_end; i++) {
+    if (args == 0)
+      args = tl = make_word_list(make_word(argv[i]), args);
+    else {
+      tl->next = make_word_list(make_word(argv[i]), (WORD_LIST*)NULL);
+      tl = tl->next;
+    }
+  }
+
   if (args) {
-    args = REVERSE_LIST(args, WORD_LIST*);
     if (start_index == 0) /* bind to $0...$n for sh -c command */
     {
       /* Posix.2 4.56.3 says that the first argument after sh -c command
@@ -1344,11 +1365,20 @@ int arg_start, arg_end, start_index;
       FREE(dollar_vars[0]);
       dollar_vars[0] = savestring(args->word->word);
       remember_args(args->next, 1);
-      push_args(args->next); /* BASH_ARGV and BASH_ARGC */
+      if (debugging_mode) {
+        push_args(args->next); /* BASH_ARGV and BASH_ARGC */
+        bash_argv_initialized = 1;
+      }
     } else /* bind to $1...$n for shell script */
     {
       remember_args(args, 1);
-      push_args(args); /* BASH_ARGV and BASH_ARGC */
+      /* We do this unconditionally so something like -O extdebug doesn't
+	     do it first.  We're setting the definitive positional params
+	     here. */
+      if (debugging_mode) {
+        push_args(args); /* BASH_ARGV and BASH_ARGC */
+        bash_argv_initialized = 1;
+      }
     }
 
     dispose_words(args);
@@ -1419,6 +1449,9 @@ static int
   if (fd < 0) {
     e = errno;
     file_error(filename);
+#if defined(JOB_CONTROL)
+    end_job_control(); /* just in case we were run as bash -i script */
+#endif
     sh_exit((e == ENOENT) ? EX_NOTFOUND : EX_NOINPUT);
   }
 
@@ -1436,6 +1469,9 @@ static int
     errno = EINVAL;
 #endif
     file_error(filename);
+#if defined(JOB_CONTROL)
+    end_job_control(); /* just in case we were run as bash -i script */
+#endif
     sh_exit(EX_NOINPUT);
   }
 
@@ -1478,9 +1514,15 @@ static int
         errno = e;
         file_error(filename);
       }
+#if defined(JOB_CONTROL)
+      end_job_control(); /* just in case we were run as bash -i script */
+#endif
       exit(EX_NOEXEC);
     } else if (sample_len > 0 && (check_binary_file(sample, sample_len))) {
       internal_error(_("%s: cannot execute binary file"), filename);
+#if defined(JOB_CONTROL)
+      end_job_control(); /* just in case we were run as bash -i script */
+#endif
       exit(EX_BINARY_FILE);
     }
     /* Now rewind the file back to the beginning. */
@@ -1617,6 +1659,7 @@ init_interactive()
   interactive = 1;
 #if defined(HISTORY)
   remember_on_history = enable_history_list = 1; /* XXX */
+  histexp_flag = history_expansion; /* XXX */
 #endif
 }
 
@@ -1777,6 +1820,7 @@ shell_reinitialize()
   forced_interactive = interactive_shell = 0;
   subshell_environment = running_in_background = 0;
   expand_aliases = 0;
+  bash_argv_initialized = 0;
 
 /* XXX - should we set jobs_m_flag to 0 here? */
 
@@ -1826,8 +1870,11 @@ int extra;
   fputs(_("\t-ilrsD or -c command or -O shopt_option\t\t(invocation only)\n"), fp);
 
   for (i = 0, set_opts = 0; shell_builtins[i].name; i++)
-    if (STREQ(shell_builtins[i].name, "set"))
+    if (STREQ(shell_builtins[i].name, "set")) {
       set_opts = savestring(shell_builtins[i].short_doc);
+      break;
+    }
+
   if (set_opts) {
     s = strchr(set_opts, '[');
     if (s == 0)

@@ -20,17 +20,17 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE = bash
-VERSION = 4.4-release
+VERSION = 5.0-release
 
 PACKAGE_BUGREPORT = bug-bash@gnu.org
 PACKAGE_NAME = bash
-PACKAGE_STRING = bash 4.4-release
-PACKAGE_VERSION = 4.4-release
+PACKAGE_STRING = bash 5.0-release
+PACKAGE_VERSION = 5.0-release
 
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 datarootdir = ${prefix}/share
 
@@ -64,7 +64,8 @@ LOCAL_DEFS = -DSHELL
 
 INCLUDES = -I. -I$(BUILD_DIR) -I$(topdir) -I$(topdir)/lib
 
-CCFLAGS = $(DEFS) $(LOCAL_DEFS) $(APP_CFLAGS) $(CPPFLAGS) ${INCLUDES} $(LOCAL_CFLAGS) $(CFLAGS)
+CCFLAGS = $(DEFS) $(LOCAL_DEFS) $(APP_CFLAGS) $(CPPFLAGS) ${INCLUDES} \
+	  $(LOCAL_CFLAGS) $(CFLAGS) ${ADDON_CFLAGS}
 
 .c.o:
 	${RM} $@

@@ -9,7 +9,7 @@
 # General Public License and is *not* in the public domain.
 
 PACKAGE = bash
-VERSION = 4.4-release
+VERSION = 5.0-release
 
 SHELL = /bin/sh
 
@@ -19,7 +19,7 @@ top_srcdir = ..
 
 
 topdir = ..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -44,10 +44,10 @@ MSGINIT = msginit
 MSGCONV = msgconv
 MSGFILTER = msgfilter
 
-POFILES =  en@quot.po en@boldquot.po af.po bg.po ca.po cs.po da.po de.po el.po eo.po es.po et.po fi.po fr.po ga.po gl.po hr.po hu.po id.po it.po ja.po lt.po nb.po nl.po pl.po pt_BR.po ro.po ru.po sk.po sl.po sr.po sv.po tr.po uk.po vi.po zh_CN.po zh_TW.po
-GMOFILES =  en@quot.gmo en@boldquot.gmo af.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo lt.gmo nb.gmo nl.gmo pl.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
-UPDATEPOFILES =  en@quot.po-update en@boldquot.po-update af.po-update bg.po-update ca.po-update cs.po-update da.po-update de.po-update el.po-update eo.po-update es.po-update et.po-update fi.po-update fr.po-update ga.po-update gl.po-update hr.po-update hu.po-update id.po-update it.po-update ja.po-update lt.po-update nb.po-update nl.po-update pl.po-update pt_BR.po-update ro.po-update ru.po-update sk.po-update sl.po-update sr.po-update sv.po-update tr.po-update uk.po-update vi.po-update zh_CN.po-update zh_TW.po-update
-DUMMYPOFILES =  en@quot.nop en@boldquot.nop af.nop bg.nop ca.nop cs.nop da.nop de.nop el.nop eo.nop es.nop et.nop fi.nop fr.nop ga.nop gl.nop hr.nop hu.nop id.nop it.nop ja.nop lt.nop nb.nop nl.nop pl.nop pt_BR.nop ro.nop ru.nop sk.nop sl.nop sr.nop sv.nop tr.nop uk.nop vi.nop zh_CN.nop zh_TW.nop
+POFILES =  en@quot.po en@boldquot.po af.po bg.po ca.po cs.po da.po de.po el.po eo.po es.po et.po fi.po fr.po ga.po gl.po hr.po hu.po id.po it.po ja.po lt.po nb.po nl.po pl.po pt.po pt_BR.po ro.po ru.po sk.po sl.po sr.po sv.po tr.po uk.po vi.po zh_CN.po zh_TW.po
+GMOFILES =  en@quot.gmo en@boldquot.gmo af.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo lt.gmo nb.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
+UPDATEPOFILES =  en@quot.po-update en@boldquot.po-update af.po-update bg.po-update ca.po-update cs.po-update da.po-update de.po-update el.po-update eo.po-update es.po-update et.po-update fi.po-update fr.po-update ga.po-update gl.po-update hr.po-update hu.po-update id.po-update it.po-update ja.po-update lt.po-update nb.po-update nl.po-update pl.po-update pt.po-update pt_BR.po-update ro.po-update ru.po-update sk.po-update sl.po-update sr.po-update sv.po-update tr.po-update uk.po-update vi.po-update zh_CN.po-update zh_TW.po-update
+DUMMYPOFILES =  en@quot.nop en@boldquot.nop af.nop bg.nop ca.nop cs.nop da.nop de.nop el.nop eo.nop es.nop et.nop fi.nop fr.nop ga.nop gl.nop hr.nop hu.nop id.nop it.nop ja.nop lt.nop nb.nop nl.nop pl.nop pt.nop pt_BR.nop ro.nop ru.nop sk.nop sl.nop sr.nop sv.nop tr.nop uk.nop vi.nop zh_CN.nop zh_TW.nop
 DISTFILES.common = Makefile.in.in remove-potcdate.sin \
 $(DISTFILES.common.extra1) $(DISTFILES.common.extra2) $(DISTFILES.common.extra3)
 DISTFILES = $(DISTFILES.common) Makevars POTFILES.in $(DOMAIN).pot stamp-po \
@@ -130,7 +130,7 @@ POTFILES = \
      ../version2.c \
      ../xmalloc.c
 
-CATALOGS =  en@quot.gmo en@boldquot.gmo af.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo lt.gmo nb.gmo nl.gmo pl.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
+CATALOGS =  en@quot.gmo en@boldquot.gmo af.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo lt.gmo nb.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 
 # Makevars gets inserted here. (Don't remove this line!)
 # Makefile variables for PO directory in any package using GNU gettext.
@@ -392,7 +392,7 @@ mostlyclean:
 clean: mostlyclean
 
 distclean: clean
-	rm -f Makefile Makefile.in POTFILES *.mo
+	rm -f Makefile Makefile.in POTFILES *.mo stamp-po
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"

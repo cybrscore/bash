@@ -183,7 +183,7 @@
 /* #undef DIRCOMPLETE_EXPAND_DEFAULT */
 
 /* Define to make the `globasciiranges' shopt option enabled by default. */
-#define GLOBASCII_DEFAULT 0
+#define GLOBASCII_DEFAULT 1
 
 /* Define to allow functions to be imported from the environment. */
 #define FUNCTION_IMPORT 1
@@ -242,6 +242,9 @@
 
 /* The number of bytes in a `long long', if we have one. */
 #define SIZEOF_LONG_LONG 8
+
+/* The number of bytes in a `wchar_t', if supported */
+#define SIZEOF_WCHAR_T 4
 
 /* System paths */
 
@@ -449,6 +452,7 @@
 /* #undef SYS_TIME_H_DEFINES_STRUCT_TIMESPEC */
 /* #undef PTHREAD_H_DEFINES_STRUCT_TIMESPEC */
 
+#define HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC 1
 #define TYPEOF_STRUCT_STAT_ST_ATIM_IS_STRUCT_TIMESPEC 1
 /* #undef HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC */
 /* #undef HAVE_STRUCT_STAT_ST_ATIMENSEC */
@@ -604,6 +608,12 @@
 
 /* Define if you have the fcntl function.  */
 #define HAVE_FCNTL 1
+
+/* Define if you have the fnmatch function.  */
+#define HAVE_FNMATCH 1
+
+/* Can fnmatch be used as a fallback to match [=equiv=] with collation weights? */
+#define FNMATCH_EQUIV_FALLBACK 0
 
 /* Define if you have the fpurge/__fpurge function.  */
 /* #undef HAVE_FPURGE */
@@ -1021,6 +1031,9 @@
 /* Define if you have the <sys/ioctl.h> header file.  */
 #define HAVE_SYS_IOCTL_H 1
 
+/* Define if you have the <sys/mman.h> header file.  */
+#define HAVE_SYS_MMAN_H 1
+
 /* Define if you have the <sys/ndir.h> header file.  */
 /* #undef HAVE_SYS_NDIR_H */
 
@@ -1126,6 +1139,8 @@
 
 /* #undef GETCWD_BROKEN */
 
+/* #undef DEV_FD_STAT_BROKEN */
+
 /* Additional defines for configuring lib/intl, maintained by autoscan/autoheader */
 
 /* Define if you have the <argz.h> header file. */
@@ -1157,6 +1172,9 @@
 
 /* Define if you have a working `mmap' system call. */
 #define HAVE_MMAP 1
+
+/* Define if you have the `mremap' function. */
+#define HAVE_MREMAP 1
 
 /* Define if you have the `munmap' function. */
 #define HAVE_MUNMAP 1

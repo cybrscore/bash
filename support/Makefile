@@ -4,11 +4,12 @@
 # documentation support: man2html
 # testing support: printenv recho zecho xcase
 #
-# bashbug lives here but is created by the top-level makefile
+# bashbug.sh lives here (created by configure), but bashbug is created by
+# the top-level makefile
 #
 # Currently only man2html is built
 #
-# Copyright (C) 1998-2009 Free Software Foundation, Inc.     
+# Copyright (C) 1998-2018 Free Software Foundation, Inc.
 
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -29,7 +30,7 @@
 topdir = ..
 srcdir = .
 
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-4.4.18-1
+BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
 
 RM	= rm -f
 SHELL	= /bin/sh
@@ -44,7 +45,7 @@ EXEEXT =
 PROFILE_FLAGS = 
 
 CFLAGS = -g -O2 -Wno-parentheses -Wno-format-security
-CFLAGS_FOR_BUILD = -g -O2 -Wno-parentheses -Wno-format-security
+CFLAGS_FOR_BUILD = -g -O2
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
 LOCAL_CFLAGS = 
@@ -79,10 +80,9 @@ man2html$(EXEEXT): $(OBJ1)
 	$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) $(OBJ1) -o $@ ${LIBS_FOR_BUILD}
 
 clean:
-	$(RM) man2html$(EXEEXT)
+	$(RM) man2html$(EXEEXT) $(OBJ1)
 
 distclean maintainer-clean mostlyclean: clean
-	$(RM) $(OBJ1)
-	$(RM) bash.pc
+	$(RM) bash.pc bashbug.sh
 
 man2html.o: man2html.c
