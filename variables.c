@@ -624,6 +624,19 @@ initialize_shell_variables (env, privmode)
     rl_prefer_env_winsize = 1;
 #endif /* READLINE && STRICT_POSIX */
 
+#if defined (AUDIT_BASH)
+  if (interactive_shell)
+    {
+      set_if_not ("BASH_AUDITING", "1");
+#if defined (AUDIT_FILE_OUTPUT)
+      set_if_not ("BASH_AUDITFILEOUTPUT", "1");
+#endif /* AUDIT_FILE_OUTPUT */
+#if defined(AUDIT_SO_OUTPUT)
+      set_if_not ("BASH_AUDITSOOUTPUT", "1");
+#endif /*  */
+    }
+#endif /* AUDIT_BASH */
+
      /*
       * 24 October 2001
       *
