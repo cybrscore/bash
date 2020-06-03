@@ -1,0 +1,2 @@
+#!/bin/bash
+make bash CDEFS=-DAUDIT_SO_PATH=\'\"/build/workspace/jvanriper/pns/setup/opt/pns-client/lib/libbash_audit.so\"\'
