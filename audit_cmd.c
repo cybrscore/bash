@@ -1,4 +1,5 @@
-#include "config.h"
+#include "audit_cmd.h"
+
 #if defined(AUDIT_BASH)
 #pragma message("Compiling with AUDIT_BASH.")
 #include <dlfcn.h>
@@ -13,22 +14,15 @@
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
+#if !defined(__USE_BSD)
 #define __USE_BSD
+#endif // __USE_BSD
 #include <aio.h>
 #include <termios.h>
 #include <time.h>
 
-#if !defined(AUDIT_FILE_PATH)
-#define AUDIT_FILE_PATH "/tmp/bash_audit_XXXXXX.%s"
-#endif
-
-#if !defined(AUDIT_SO_PATH)
-#define AUDIT_SO_PATH "/lib/libbash_audit.so"
-#endif
-
-#if !defined(AUDIT_BUFFER_LEN)
-#define AUDIT_BUFFER_LEN 4096
-#endif
+#include <stdint.h>
+#include "variables.h"
 
 #define AUDIT_FDM 0
 #define AUDIT_FDS 1
@@ -47,20 +41,20 @@
 #endif
 
 #if defined(AUDIT_SO_OUTPUT)
-#pragma message("Compiling for shared object output.")
 typedef void* (*audit_open_fn_t)(const char*, unsigned int);
 typedef void (*audit_output_fn_t)(void*, const char*, unsigned int);
 typedef void (*audit_close_fn_t)(void*, int);
+typedef const char* (*audit_info_fn_t)();
 char* audit_so_path;
 void* audit_so_h;
 void* audit_h;
 audit_open_fn_t audit_open_fn;
 audit_output_fn_t audit_output_fn;
 audit_close_fn_t audit_close_fn;
+audit_info_fn_t audit_info_fn;
 #endif // AUDIT_SO_OUTPUT
 
 #if defined(AUDIT_FILE_OUTPUT)
-#pragma message("Compiling for file output.")
 int audit_fp;
 int audit_fp_cmd;
 int audit_stop_io;
@@ -99,6 +93,7 @@ void audit_init()
   audit_open_fn = 0;
   audit_output_fn = 0;
   audit_close_fn = 0;
+  audit_info_fn = 0;
 #endif // AUDIT_SO_OUTPUT
   last_output = 0;
   last_endio = 0;
@@ -123,6 +118,13 @@ void audit_reset()
 #endif // AUDIT_SO_OUTPUT
   audit_init();
 }
+
+#if defined(AUDIT_SO_OUTPUT)
+char* get_audit_so_path()
+{
+    return audit_so_path;
+}
+#endif
 
 void* audit_stdout(void* tid)
 {
@@ -260,6 +262,15 @@ void audit_tee()
   }
 }
 
+const char* audit_info()
+{
+    const char* result = 0;
+    if (audit_info_fn) {
+        result = audit_info_fn();
+    }
+    return result;
+}
+
 void audit_start()
 {
   audit_init();
@@ -282,6 +293,13 @@ void audit_start()
     audit_close_fn = (audit_close_fn_t)dlsym(audit_so_h, "bash_audit_close");
     if (audit_close_fn == 0) {
       AUDIT_LOG(LOG_DEBUG, "failed to acquire audit_close_fn: %s.", dlerror());
+    }
+    audit_info_fn = (audit_info_fn_t)dlsym(audit_so_h, "bash_audit_info");
+    if (audit_info_fn) {
+        const char* info = audit_info_fn();
+        if (info) {
+            bind_variable("BASH_AUDIT_INFO", (char*)info, 0);
+        }
     }
   } else {
     AUDIT_LOG(LOG_DEBUG, "audit_so_h was not loaded from %s: %s.", audit_so_path, dlerror());

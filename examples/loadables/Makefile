@@ -35,7 +35,7 @@ loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)
 
 topdir = ../..
-BUILD_DIR = /home/jvanriper/jvanriper/bash/bash-5.0
+BUILD_DIR = /home/jvanriper/bash
 srcdir = .
 
 

@@ -1199,6 +1199,10 @@
 /* Define if you have the `__argz_stringify' function. */
 #undef HAVE___ARGZ_STRINGIFY
 
+/* End additions for lib/intl */
+
+/* Defines for AUDIT_BASH */
+
 /* Define if you want to support auditing. */
 #undef AUDIT_BASH
 
@@ -1208,7 +1212,7 @@
 /* Define if auditing outputs to shared object. */
 #undef AUDIT_SO_OUTPUT
 
-/* End additions for lib/intl */
+/* End defines for AUDIT_BASH */
 
 #include "config-bot.h"
 

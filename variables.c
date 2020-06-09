@@ -71,6 +71,10 @@
 #  include <tilde/tilde.h>
 #endif
 
+#if defined (AUDIT_BASH)
+#  include "audit_cmd.h"
+#endif /* AUDIT_BASH */
+
 #if defined (HISTORY)
 #  include "bashhist.h"
 #  include <readline/history.h>
@@ -629,10 +633,14 @@ initialize_shell_variables (env, privmode)
     {
       set_if_not ("BASH_AUDITING", "1");
 #if defined (AUDIT_FILE_OUTPUT)
-      set_if_not ("BASH_AUDITFILEOUTPUT", "1");
+      set_if_not ("BASH_AUDITFILEOUTPUT", AUDIT_FILE_PATH);
 #endif /* AUDIT_FILE_OUTPUT */
 #if defined(AUDIT_SO_OUTPUT)
-      set_if_not ("BASH_AUDITSOOUTPUT", "1");
+      set_if_not ("BASH_AUDITSOOUTPUT", AUDIT_SO_PATH);
+      const char* audit_info_txt = audit_info();
+      if (audit_info_txt) {
+          set_if_not("BASH_AUDITINFO", audit_info_txt);
+      }
 #endif /*  */
     }
 #endif /* AUDIT_BASH */

@@ -153,6 +153,9 @@ opt_job_control=yes
 opt_alias=yes
 opt_readline=yes
 opt_history=yes
+opt_audit=no
+opt_audit_files=no
+opt_audit_so=yes
 opt_bang_history=yes
 opt_dirstack=yes
 opt_restricted=yes
@@ -205,7 +208,7 @@ if test $opt_minimal_config = yes; then
 	opt_net_redirs=no opt_progcomp=no opt_separate_help=no
 	opt_multibyte=yes opt_cond_regexp=no opt_coproc=no
 	opt_casemod_attrs=no opt_casemod_expansions=no opt_extglob_default=no
-	opt_globascii_default=yes
+	opt_globascii_default=yes opt_audit=no opt_audit_files=no opt_audit_so=no
 fi
 
 AC_ARG_ENABLE(alias, AC_HELP_STRING([--enable-alias], [enable shell aliases]), opt_alias=$enableval)
@@ -245,6 +248,9 @@ AC_ARG_ENABLE(single-help-strings, AC_HELP_STRING([--enable-single-help-strings]
 AC_ARG_ENABLE(strict-posix-default, AC_HELP_STRING([--enable-strict-posix-default], [configure bash to be posix-conformant by default]), opt_strict_posix=$enableval)
 AC_ARG_ENABLE(usg-echo-default, AC_HELP_STRING([--enable-usg-echo-default], [a synonym for --enable-xpg-echo-default]), opt_xpg_echo=$enableval)
 AC_ARG_ENABLE(xpg-echo-default, AC_HELP_STRING([--enable-xpg-echo-default], [make the echo builtin expand escape sequences by default]), opt_xpg_echo=$enableval)
+AC_ARG_ENABLE(audit, AC_HELP_STRING([--enable-audit], [enables alternative third party auditing of command line]), opt_audit=$enableval)
+AC_ARG_ENABLE(audit_files, AC_HELP_STRING([--enable-audit-files], [enables generation of text files holding cmdline auditing information]), opt_audit_files=$enableval)
+AC_ARG_ENABLE(audit_so, AC_HELP_STRING([--enable-audit-so], [enables third party cmdline auditing via shared object]), opt_audit_so=$enableval)
 
 dnl options that alter how bash is compiled and linked
 AC_ARG_ENABLE(mem-scramble, AC_HELP_STRING([--enable-mem-scramble], [scramble memory on calls to malloc and free]), opt_memscramble=$enableval)
@@ -356,6 +362,15 @@ AC_DEFINE(FUNCTION_IMPORT)
 fi
 if test $opt_dev_fd_stat_broken = yes; then
 AC_DEFINE(DEV_FD_STAT_BROKEN)
+fi
+if test $opt_audit = yes; then
+AC_DEFINE(AUDIT_BASH)
+fi
+if test $opt_audit_file = yes; then
+AC_DEFINE(AUDIT_FILE_OUTPUT)
+fi
+if test $opt_audit_so = yes; then
+AC_DEFINE(AUDIT_SO_OUTPUT)
 fi
 
 if test $opt_memscramble = yes; then
@@ -904,6 +919,7 @@ AC_TYPE_UID_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UINTPTR_T
+AC_TYPE_INTMAX_T
 
 AC_CHECK_TYPE(ssize_t, int)
 AC_CHECK_TYPE(time_t, long)
