@@ -393,6 +393,7 @@ void audit_cmd(const char* cmd)
 void audit_endio()
 {
   AUDIT_LOG(LOG_DEBUG, "audit_endio called.");
+  /*
   struct timespec t;
   t.tv_sec = 0;
   t.tv_nsec = 100000; // 1/100th of a second.
@@ -405,6 +406,7 @@ void audit_endio()
     nanosleep(&t, 0);
     ++count;
   }
+  */
 #if defined(AUDIT_SO_OUTPUT)
   if (audit_so_h != 0 && audit_close_fn != 0) {
     AUDIT_LOG(LOG_DEBUG, "calling audit_close_fn.");

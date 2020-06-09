@@ -178,7 +178,7 @@ reader_loop ()
 
 	      execute_command (current_command);
 #if defined(AUDIT_BASH)
-          audit_endio();
+          /* audit_endio(); */
 #endif // AUDIT_BASH
 
 	    exec_done:

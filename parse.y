@@ -92,6 +92,10 @@ typedef void *alias_t;
 #  include "maxpath.h"
 #endif /* PROMPT_STRING_DECODE */
 
+#if defined(AUDIT_BASH)
+#  include "audit_cmd.h"
+#endif /* AUDIT_BASH */
+
 #define RE_READ_TOKEN	-99
 #define NO_EXPANSION	-100
 
@@ -5635,6 +5639,9 @@ set_current_prompt_level (x)
 static void
 print_prompt ()
 {
+#if defined(AUDIT_BASH)
+  audit_endio();
+#endif /* AUDIT_BASH */
   fprintf (stderr, "%s", current_decoded_prompt);
   fflush (stderr);
 }
