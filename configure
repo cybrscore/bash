@@ -762,6 +762,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -793,9 +794,6 @@ enable_minimal_config
 enable_alias
 enable_arith_for_command
 enable_array_variables
-enable_audit
-enable_audit_files
-enable_audit_so
 enable_bang_history
 enable_brace_expansion
 enable_casemod_attributes
@@ -830,6 +828,9 @@ enable_single_help_strings
 enable_strict_posix_default
 enable_usg_echo_default
 enable_xpg_echo_default
+enable_audit
+enable_audit_files
+enable_audit_so
 enable_mem_scramble
 enable_profiling
 enable_static_link
@@ -895,6 +896,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1147,6 +1149,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1284,7 +1295,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1437,6 +1448,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1538,6 +1550,12 @@ Optional Features:
   --enable-xpg-echo-default
                           make the echo builtin expand escape sequences by
                           default
+  --enable-audit          enables alternative third party auditing of command
+                          line
+  --enable-audit-files    enables generation of text files holding cmdline
+                          auditing information
+  --enable-audit-so       enables third party cmdline auditing via shared
+                          object
   --enable-mem-scramble   scramble memory on calls to malloc and free
   --enable-profiling      allow profiling with gprof
   --enable-static-link    link bash statically, for use as a root shell
@@ -3007,7 +3025,6 @@ fi
 
 if test $opt_minimal_config = yes; then
 	opt_job_control=no opt_alias=no opt_readline=no
-  opt_audit=no opt_audit_files=no opt_audit_so=no
 	opt_history=no opt_bang_history=no opt_dirstack=no
 	opt_restricted=no opt_process_subst=no opt_prompt_decoding=no
 	opt_select=no opt_help=no opt_array_variables=no opt_dparen_arith=no
@@ -3016,7 +3033,7 @@ if test $opt_minimal_config = yes; then
 	opt_net_redirs=no opt_progcomp=no opt_separate_help=no
 	opt_multibyte=yes opt_cond_regexp=no opt_coproc=no
 	opt_casemod_attrs=no opt_casemod_expansions=no opt_extglob_default=no
-	opt_globascii_default=yes
+	opt_globascii_default=yes opt_audit=no opt_audit_files=no opt_audit_so=no
 fi
 
 # Check whether --enable-alias was given.
@@ -3032,29 +3049,6 @@ fi
 # Check whether --enable-array-variables was given.
 if test "${enable_array_variables+set}" = set; then :
   enableval=$enable_array_variables; opt_array_variables=$enableval
-fi
-
-# Check whether --enable-audit was given.
-if test "${enable_audit+set}" = set; then :
-  enableval=$enable_audit; opt_audit=$enableval
-fi
-if test "${enable_audit_files+set}" = set; then :
-  enableval=$enable_audit_files; opt_audit_files=$enableval
-fi
-if test "${enable_audit_so+set}" = set; then :
-  enableval=$enable_audit_so; opt_audit_so=$enableval
-fi
-
-
-# Check whether --enable-audit was given.
-if test "${enable_audit+set}" = set; then :
-  enableval=$enable_audit; opt_audit=$enableval
-fi
-if test "${enable_audit_files+set}" = set; then :
-  enableval=$enable_audit_files; opt_audit_files=$enableval
-fi
-if test "${enable_audit_so+set}" = set; then :
-  enableval=$enable_audit_so; opt_audit_so=$enableval
 fi
 
 # Check whether --enable-bang-history was given.
@@ -3227,6 +3221,21 @@ if test "${enable_xpg_echo_default+set}" = set; then :
   enableval=$enable_xpg_echo_default; opt_xpg_echo=$enableval
 fi
 
+# Check whether --enable-audit was given.
+if test "${enable_audit+set}" = set; then :
+  enableval=$enable_audit; opt_audit=$enableval
+fi
+
+# Check whether --enable-audit_files was given.
+if test "${enable_audit_files+set}" = set; then :
+  enableval=$enable_audit_files; opt_audit_files=$enableval
+fi
+
+# Check whether --enable-audit_so was given.
+if test "${enable_audit_so+set}" = set; then :
+  enableval=$enable_audit_so; opt_audit_so=$enableval
+fi
+
 
 # Check whether --enable-mem-scramble was given.
 if test "${enable_mem_scramble+set}" = set; then :
@@ -3375,6 +3384,18 @@ $as_echo "#define FUNCTION_IMPORT 1" >>confdefs.h
 fi
 if test $opt_dev_fd_stat_broken = yes; then
 $as_echo "#define DEV_FD_STAT_BROKEN 1" >>confdefs.h
+
+fi
+if test $opt_audit = yes; then
+$as_echo "#define AUDIT_BASH 1" >>confdefs.h
+
+fi
+if test $opt_audit_file = yes; then
+$as_echo "#define AUDIT_FILE_OUTPUT 1" >>confdefs.h
+
+fi
+if test $opt_audit_so = yes; then
+$as_echo "#define AUDIT_SO_OUTPUT 1" >>confdefs.h
 
 fi
 
@@ -4752,7 +4773,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
+#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -4798,7 +4819,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
+#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -4822,7 +4843,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
+#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -4867,7 +4888,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
+#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -4891,7 +4912,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
+#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -5519,17 +5540,6 @@ if test $opt_readline = yes; then
 else
 	RL_LIBDIR='$(dot)/$(LIBSUBDIR)/readline'
 	READLINE_LIB= READLINE_DEP=
-fi
-if test $opt_audit = yes; then
-  if test $opt_audit = yes; then
-    $as_echo "#define AUDIT_BASH 1" >>confdefs.h
-  fi
-  if test $opt_audit_files = yes; then
-    $as_echo "#define AUDIT_FILE_OUTPUT 1" >>confdefs.h
-  fi
-  if test $opt_audit_so = yes; then
-    $as_echo "#define AUDIT_SO_OUTPUT 1" >>confdefs.h
-  fi
 fi
 if test $opt_history = yes || test $opt_bang_history = yes; then
 	if test $opt_history = yes; then
@@ -12113,6 +12123,142 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
        test -z "$ac_type" && break
      done
+fi
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for unsigned long long int" >&5
+$as_echo_n "checking for unsigned long long int... " >&6; }
+if ${ac_cv_type_unsigned_long_long_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_type_unsigned_long_long_int=yes
+     if test "x${ac_cv_prog_cc_c99-no}" = xno; then
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+  /* For now, do not test the preprocessor; as of 2007 there are too many
+	 implementations with broken preprocessors.  Perhaps this can
+	 be revisited in 2012.  In the meantime, code should not expect
+	 #if to work with literals wider than 32 bits.  */
+      /* Test literals.  */
+      long long int ll = 9223372036854775807ll;
+      long long int nll = -9223372036854775807LL;
+      unsigned long long int ull = 18446744073709551615ULL;
+      /* Test constant expressions.   */
+      typedef int a[((-9223372036854775807LL < 0 && 0 < 9223372036854775807ll)
+		     ? 1 : -1)];
+      typedef int b[(18446744073709551615ULL <= (unsigned long long int) -1
+		     ? 1 : -1)];
+      int i = 63;
+int
+main ()
+{
+/* Test availability of runtime routines for shift and division.  */
+      long long int llmax = 9223372036854775807ll;
+      unsigned long long int ullmax = 18446744073709551615ull;
+      return ((ll << 63) | (ll >> 63) | (ll < i) | (ll > i)
+	      | (llmax / ll) | (llmax % ll)
+	      | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
+	      | (ullmax / ull) | (ullmax % ull));
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+else
+  ac_cv_type_unsigned_long_long_int=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+     fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long_int" >&5
+$as_echo "$ac_cv_type_unsigned_long_long_int" >&6; }
+  if test $ac_cv_type_unsigned_long_long_int = yes; then
+
+$as_echo "#define HAVE_UNSIGNED_LONG_LONG_INT 1" >>confdefs.h
+
+  fi
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long long int" >&5
+$as_echo_n "checking for long long int... " >&6; }
+if ${ac_cv_type_long_long_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_type_long_long_int=yes
+      if test "x${ac_cv_prog_cc_c99-no}" = xno; then
+	ac_cv_type_long_long_int=$ac_cv_type_unsigned_long_long_int
+	if test $ac_cv_type_long_long_int = yes; then
+	  	  	  	  if test "$cross_compiling" = yes; then :
+  :
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+		 #ifndef LLONG_MAX
+		 # define HALF \
+			  (1LL << (sizeof (long long int) * CHAR_BIT - 2))
+		 # define LLONG_MAX (HALF - 1 + HALF)
+		 #endif
+int
+main ()
+{
+long long int n = 1;
+		 int i;
+		 for (i = 0; ; i++)
+		   {
+		     long long int m = n << i;
+		     if (m >> i != n)
+		       return 1;
+		     if (LLONG_MAX / 2 < m)
+		       break;
+		   }
+		 return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+
+else
+  ac_cv_type_long_long_int=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+	fi
+      fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_long_long_int" >&5
+$as_echo "$ac_cv_type_long_long_int" >&6; }
+  if test $ac_cv_type_long_long_int = yes; then
+
+$as_echo "#define HAVE_LONG_LONG_INT 1" >>confdefs.h
+
+  fi
+
+
+
+  ac_fn_c_check_type "$LINENO" "intmax_t" "ac_cv_type_intmax_t" "$ac_includes_default"
+if test "x$ac_cv_type_intmax_t" = xyes; then :
+
+$as_echo "#define HAVE_INTMAX_T 1" >>confdefs.h
+
+else
+  test $ac_cv_type_long_long_int = yes \
+       && ac_type='long long int' \
+       || ac_type='long int'
+
+cat >>confdefs.h <<_ACEOF
+#define intmax_t $ac_type
+_ACEOF
+
 fi
 
 
