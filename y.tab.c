@@ -134,10 +134,6 @@ typedef void* alias_t;
 #include "maxpath.h"
 #endif /* PROMPT_STRING_DECODE */
 
-#if defined(AUDIT_BASH)
-#include "audit_cmd.h"
-#endif
-
 #define RE_READ_TOKEN -99
 #define NO_EXPANSION -100
 
@@ -3856,9 +3852,6 @@ yy_readline_get()
     }
 
     sh_unset_nodelay_mode(fileno(rl_instream)); /* just in case */
-#if defined(AUDIT_BASH)
-    audit_endio();
-#endif
     current_readline_line = readline(current_readline_prompt ? current_readline_prompt : "");
 
     CHECK_TERMSIG;

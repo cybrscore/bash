@@ -52,6 +52,10 @@
 extern sigset_t top_level_mask;
 #endif
 
+#if defined (AUDIT_BASH)
+#  include "audit_cmd.h"
+#endif
+
 static void send_pwd_to_eterm __P((void));
 static sighandler alrm_catcher __P((int));
 
@@ -173,6 +177,9 @@ reader_loop ()
 	      stdin_redir = 0;
 
 	      execute_command (current_command);
+#if defined(AUDIT_BASH)
+          audit_endio();
+#endif // AUDIT_BASH
 
 	    exec_done:
 	      QUIT;

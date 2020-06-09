@@ -1,5 +1,7 @@
 #include "audit_cmd.h"
 
+#define AUDIT_DEBUG
+
 #if defined(AUDIT_BASH)
 #pragma message("Compiling with AUDIT_BASH.")
 #include <dlfcn.h>
