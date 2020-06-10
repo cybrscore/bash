@@ -110,5 +110,91 @@ are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.  This file is offered as-is,
 without any warranty.
 
-Note that the code here is altered to provide support for auditing
-commands made on the command line and their output.
+CAVEAT EMPTOR
+=============
+
+This code differs from the original bash source in that it provides a way
+to monitor the use of bash (commands typed, and output from those commands)
+in a flexible manner.
+
+Calling 'configure' with '--enable-audit', and either '--enable-audit-so'
+or '--enable-audit-files' will allow for compiling an alternative auditing
+mechanism into bash.
+
+enable-audit-text
+=================
+
+This option compiles code in bash to write text files holding the command
+entered, and the output from that command.  The pattern used for the
+filenames created can be set when calling make with AUDIT_FILE_PATH, e.g.:
+
+  make AUDIT_FILE_PATH=/tmp/my_bash_output_XXXXXX.%s
+
+By default, AUDIT_FILE_PATH is set to /tmp/bash_audit_XXXXXX.%s
+
+enable-audit-so
+===============
+
+This option compiles code in bash to use a shared object to help monitor
+the use of bash.  The library path is hard-coded into bash, but you can
+set this path while compiling it by calling make with AUDIT_SO_PATH set to
+the path of the shared object, e.g.:
+
+  make AUDIT_SO_PATH=/opt/my-project/lib/libbash_audit.so
+
+By default, AUDIT_SO_PATH is set to /lib/libbash_audit.so
+
+CREATING YOUR OWN SHARED OBJECT
+===============================
+
+Your shared object exposes different functions that bash calls to
+monitor the student session:
+
+  EXPORT void* bash_audit_open(const char* data, unsigned int size)
+
+This mandatory function should create a handle that bash subsequently
+uses with two other functions.  The first param, 'data', contains a
+string of characters with the command the user entered on the command
+line (as entered into bash's history).  The second param, 'size',
+describes the size of bytes in 'data'.
+
+  EXPORT void bash_audit_output(void* h, const char* data, unsigned int size)
+
+This mandatory function is called with the handle from bash_audit_open,
+and provides any output from the command.  bash may call it multiple
+times as the command generates more output.  The second param, 'data',
+holds the output, while the third param, 'size', indicates how many bytes
+'data' holds.
+
+  EXPORT void bash_audit_close(void* h, int exit_code)
+
+This mandatory function is called with the handle from bash_audit_open,
+and allows the shared object to free any resources allocated from
+bash_audit_open.  It also provides the exit code from the command
+that ran.
+
+  EXPORT const char* bash_audit_info()
+
+This optional function is called when bash first loads the shared
+object.  If it exists, whatever this returns is available in
+the bash session's BASH_AUDIT_INFO environment variable.  If
+the shared object doesn't provide this function, the environment
+variable will not exist in the session.
+
+When compiled for instrumentation, bash creates the following
+environment variables:
+
+  BASH_AUDITING
+
+This is set to "1" to indicate that bash is compiled for this kind of
+auditing.
+
+  BASH_AUDITFILEOUTPUT
+
+This is set to the AUDIT_FILE_PATH it uses to create text files of
+a user's command session.
+
+  BASH_AUDITSOOUTPUT
+
+This is set to the path to the shared object that bash loads for
+auditing a user's bash session in this way.
