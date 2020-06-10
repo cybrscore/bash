@@ -148,7 +148,11 @@ CREATING YOUR OWN SHARED OBJECT
 ===============================
 
 Your shared object exposes different functions that bash calls to
-monitor the student session:
+monitor the student session.  In this document, EXPORT is set as:
+
+#define EXPORT __attribute__((__visbility__("default")))
+
+Your shared object should expose the following functions:
 
   EXPORT void* bash_audit_open(const char* data, unsigned int size)
 
